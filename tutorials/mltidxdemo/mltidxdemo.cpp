@@ -1,22 +1,13 @@
-#include <utility>
-#include <vector>
 #include <string>
-#include <eosiolib/crypto.h>
 #include <eosiolib/types.hpp>
 #include <eosiolib/print.hpp>
-#include <eosiolib/action.hpp>
-#include <eosiolib/multi_index.hpp>
-#include <eosiolib/contract.hpp>
-
 #include <eosio.system/eosio.system.hpp>
 
 using namespace eosio;
 
-using eosio::indexed_by;
-using eosio::const_mem_fun;
-using eosio::asset;
-
 class mltidxdemo : public contract {
+
+using contract::contract;
 
 public:
     mltidxdemo(account_name self) :
@@ -66,7 +57,7 @@ public:
 
         if (my_database_itr->id == unique_id) {
             print(" Here is your info ");
-            print(" PRINT ROW HERE ");
+            print(" ID: ", my_database_itr->id);
         }
 
     }
@@ -89,7 +80,7 @@ public:
 private:
     // @abi table mltidxdb i64
     struct db_table {
-        uint64_t id;
+        uint64_t    id;
         std::string name;
         std::string address;
         time date_created;
