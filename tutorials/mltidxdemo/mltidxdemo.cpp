@@ -58,6 +58,7 @@ public:
         if (my_database_itr->id == unique_id) {
             print(" Here is your info ");
             print(" ID: ", my_database_itr->id);
+            print(" PRINT REST OF INFO HERE ");
         }
 
     }
