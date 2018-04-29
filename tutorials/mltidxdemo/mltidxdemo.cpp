@@ -16,33 +16,25 @@ public:
     {}
 
     // @abi action
-    void set(const uint64_t unique_id, std::string name = "", std::string address = "") {
+    void create(const uint64_t unique_id, std::string name = "", std::string address = "") {
 
         auto my_database_itr = my_database.find(unique_id);
 
-        /* Check if this is a new ID and create Row */
-        if (my_database_itr == my_database.end()) {
+        eosio_assert(my_database_itr == my_database.end(),
+                    " ID already exists, use 'set' to update info ");
 
-            print(" ID doesn't exist ");
-            print(" Creating new Row for ID ");
+        print(" ID doesn't exist ");
+        print(" Creating new Row for ID ");
 
-            auto my_database_itr = my_database.emplace(_self, [&](db_table& my_row) {
-                my_row.id           = unique_id;
-                my_row.name         = name;
-                my_row.address      = address;
-                my_row.date_created = now();
-            });
+        my_database.emplace(_self, [&](db_table& my_row) {
+            my_row.id           = unique_id;
+            my_row.name         = name;
+            my_row.address      = address;
+            my_row.date_created = now();
+        });
 
-            print(" Database set ");
-            return;
-
-        } else {
-            /* Check if this should update an existing ID */
-            print(" Changing Row for ID ", unique_id);
-
-            print(" I dont know how to update existing row yet ");
-            return;
-        }
+        print(" Database set ");
+        return;
 
     }
 
@@ -58,8 +50,27 @@ public:
         if (my_database_itr->id == unique_id) {
             print(" Here is your info ");
             print(" ID: ", my_database_itr->id);
-            print(" PRINT REST OF INFO HERE ");
+            print(" Name: ", my_database_itr->name.c_str());
+            print(" Address: ", my_database_itr->address.c_str());
+            print(" Date Created: ", my_database_itr->date_created);
         }
+
+    }
+
+    // @abi action
+    void update(const uint64_t unique_id, std::string name = "", std::string address = "") {
+        /* NOTE: In the future you will want to require the authorizations of the sender
+        *        when preforming the update function. */
+        auto my_database_itr = my_database.find(unique_id);
+
+        eosio_assert(my_database_itr != my_database.end(), "That ID doesn't exist");
+        /* The zero in the parameters indicates that the contract will be billed for ram*/
+        my_database.modify(my_database_itr, 0, [&](db_table& db_to_update) {
+            db_to_update.name    = name;
+            db_to_update.address = address;
+        });
+
+        print(" ID: ", unique_id, " updated ");
 
     }
 
@@ -95,4 +106,4 @@ private:
 
 };
 
-EOSIO_ABI(mltidxdemo, (get)(set)(erase))
+EOSIO_ABI(mltidxdemo, (create)(get)(update)(erase))
