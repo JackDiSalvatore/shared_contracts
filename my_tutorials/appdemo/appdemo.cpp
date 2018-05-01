@@ -7,7 +7,10 @@ void appdemo::hello(account_name account) {
     print("Hello ", name{account});
 }
 
-void appdemo::create(account_name account, string username, uint32_t age, string bio) {
+void appdemo::create(const account_name account,
+                     const string&      username,
+                     uint32_t           age,
+                     const string&      bio) {
     require_auth(account);
 
     profile_table profiles(_self, _self);
@@ -24,21 +27,23 @@ void appdemo::create(account_name account, string username, uint32_t age, string
     });
 }
 
-void appdemo::get(account_name account) {
+void appdemo::get(const account_name account) {
     profile_table profiles(_self, _self);
 
     auto itr = profiles.find(account);
 
     eosio_assert(itr != profiles.end(), "Account does not exist");
 
-    //print("Account: ", name{itr->account}, "\n");
-    print("Username: ", itr->username.c_str(), "\n");
-    //print("Age: ", itr->age , "\n");
-    //print("Bio: ", itr->bio.c_str(), "\n");
-
+    print("Account: ", name{itr->account}, " , ");
+    print("Username: ", itr->username.c_str(), " , ");
+    print("Age: ", itr->age , " , ");
+    print("Bio: ", itr->bio.c_str());
 }
 
-void appdemo::update(account_name account, string username, uint32_t age, string bio) {
+void appdemo::update(const account_name account,
+                     const string&      username,
+                     uint32_t           age,
+                     const string&      bio) {
     require_auth(account);
 
     profile_table profiles(_self, _self);
@@ -54,14 +59,15 @@ void appdemo::update(account_name account, string username, uint32_t age, string
     });
 }
 
-void appdemo::remove(account_name account) {
+void appdemo::remove(const account_name account) {
     require_auth(account);
 
     profile_table profiles(_self, _self);
 
     auto itr = profiles.find(account);
 
-    eosio_assert(itr == profiles.end(), "Account does not exist");
+    eosio_assert(itr != profiles.end(), "Account does not exist");
 
     profiles.erase(itr);
+    print(name{account} , " deleted!");
 }

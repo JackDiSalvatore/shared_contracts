@@ -17,19 +17,25 @@ public:
             : contract(self) {}
 
     // @abi action
-    void hello(account_name account);
+    void hello(const account_name account);
 
     // @abi action
-    void create(account_name account, string username, uint32_t age, string bio);
+    void create(const account_name account,
+                const string&      username,
+                uint32_t           age,
+                const string&      bio);
 
     // @abi action
-    void get(account_name account);
+    void get(const account_name account);
 
     // @abi action
-    void update(account_name account, string username, uint32_t age, string bio);
+    void update(const account_name account,
+                const string&      username,
+                uint32_t           age,
+                const string&      bio);
 
     // @abi action
-    void remove(account_name account);
+    void remove(const account_name account);
 
 private:
     // @abi table profile i64
