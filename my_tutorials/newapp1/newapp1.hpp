@@ -31,6 +31,12 @@ public:
     // @abi action
     void get(const account_name);
 
+    // @abi action
+    void byage(uint32_t age);
+
+    // @abi action
+    void rangeage(uint32_t younger, uint32_t older);
+
 private:
 
     // @abi table profiles i64
@@ -41,10 +47,15 @@ private:
         uint32_t     age;
 
         account_name primary_key() const { return account; }
+        uint64_t     by_age() const { return age; }
         EOSLIB_SERIALIZE(profile, (account)(username)(bio)(age))
     };
 
-    typedef eosio::multi_index<N(profiles), profile> profile_table;
+    typedef eosio::multi_index<N(profiles), profile,
+        indexed_by< N(age),
+            const_mem_fun<profile, uint64_t, &profile::by_age>
+        >
+    > profile_table;
 };
 
-EOSIO_ABI(newapp1, (hello)(create)(update)(remove)(get))
+EOSIO_ABI(newapp1, (hello)(create)(update)(remove)(get)(byage)(rangeage))

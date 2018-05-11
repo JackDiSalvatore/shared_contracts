@@ -72,3 +72,27 @@ void newapp1::get(const account_name account) {
     print("Bio: ",      itr->bio.c_str(),      " , ");
     print("Age: ",      itr->age);
 }
+
+void newapp1::byage(uint32_t age) {
+    profile_table profile(_self, _self);
+
+    auto age_index = profile.get_index<N(age)>();
+
+    auto itr = age_index.lower_bound(age);
+
+    for(; itr != age_index.end() && itr->age == age; ++itr)
+        print(name{itr->account}, " is ", itr->age, " years old\n");
+}
+
+void newapp1::rangeage(uint32_t younger, uint32_t older) {
+    profile_table profile(_self, _self);
+
+    auto age_index = profile.get_index<N(age)>();
+
+    auto begin = age_index.lower_bound(younger);
+    auto end   = age_index.upper_bound(older);
+
+    for_each(begin, end, [&](auto& p) {
+        print(name{p.account}, " is ", p.age, " years old\n");
+    });
+}
