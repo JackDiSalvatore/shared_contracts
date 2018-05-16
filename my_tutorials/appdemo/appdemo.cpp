@@ -71,3 +71,36 @@ void appdemo::remove(const account_name account) {
     profiles.erase(itr);
     print(name{account} , " deleted!");
 }
+
+void appdemo::byage(uint32_t age) {
+    print("Checking age: ", age, "\n");
+    profile_table profiles(_self, _self);
+
+    // get an interface to the 'profiles' containter
+    // that looks up a profile by its age
+    auto age_index = profiles.get_index<N(age)>();
+
+    // lower_bound is an associative container operator
+    // which returns an iterator to the first element that is
+    // to lower then the key
+    // we use lower bound, because we want to find everyone
+    // who is this age, there may be multiple
+    auto itr = age_index.lower_bound(age);
+
+    for(; itr != age_index.end() && itr->age == age; ++itr) {
+        print(itr->username.c_str(), " is ", itr->age, " years old\n");
+    }
+}
+
+void appdemo::agerange(uint32_t young, uint32_t old) {
+    profile_table profiles(_self, _self);
+
+    auto age_index = profiles.get_index<N(age)>();
+
+    auto begin = age_index.lower_bound(young);
+    auto end   = age_index.upper_bound(old);
+
+    for_each(begin, end, [&](auto& p) {
+        print(p.username.c_str(), " is ", p.age, " years old\n");
+    });
+}
