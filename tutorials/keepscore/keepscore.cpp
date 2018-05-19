@@ -11,12 +11,36 @@ void keepscore::init(account_name app_owner) {
         print("App created with account: ", name{app_owner});
 }
 
-void keepscore::scored(uint64_t          id,
-                      string&             username,
-                      const account_name  account,
-                      uint64_t           score) {
+void keepscore::scored(string&             username,
+                       const account_name  account,
+                       uint64_t            new_score) {
     require_auth(appOwner());
     require_auth(account);
 
-    print("You got this far!");
+    uuid keyid = hashStr(username);
+
+    Users users(_self, _self);
+
+    auto itr = users.find(keyid);
+
+    if (itr ==  users.end()) {
+        print("Creating new user ", username.c_str());
+
+        users.emplace(/* billed to */account, [&](auto& u) {
+            u.keyid    = keyid;
+            u.username = username;
+            u.account  = account;
+            u.score    = new_score;
+        });
+    }
+    else if (itr != users.end()) {
+        print("Updating ", username.c_str(), "'s score");
+
+/*        users.modify(itr, 0, [&](auto& u) {
+            u.score = new_score;
+        });*/
+    }
+
 }
+
+EOSIO_ABI(keepscore, (init)(scored))

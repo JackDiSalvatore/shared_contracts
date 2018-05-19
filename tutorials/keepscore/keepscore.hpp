@@ -1,5 +1,6 @@
 #include <eosiolib/eosio.hpp>
 #include <eosiolib/singleton.hpp>
+#include <eosiolib/crypto.h>
 
 using namespace std;
 using namespace eosio;
@@ -11,28 +12,35 @@ public:
 
     void init(account_name app_owner);
 
-    void scored(uint64_t          id,
-               string&             username,
-               const account_name  account,
-               uint64_t           score);
+    void scored(string&             username,
+                const account_name  account,
+                uint64_t            new_score);
 
     void remove();
 
     static constexpr uint64_t code = N(keepscore);
 
 private:
+    typedef uint64_t uuid;
+
     /* Use this to make your app sign transactions */
     account_name appOwner() {
         return AppSettings().get().app_owner;
     }
 
-    struct Scores {
-        uint64_t     id;
+    inline static uint64_t hashStr( const string& strkey ){
+        return hash<string>{}(strkey);
+    }
+
+    // @abi table users i64
+    struct User {
+        uint64_t     keyid;
         string       username;
         account_name account;
         uint64_t     score;
 
-        EOSLIB_SERIALIZE(Scores, (id)(username)(account)(score))
+        uuid primary_key() const { return keyid; }
+        EOSLIB_SERIALIZE(User, (keyid)(username)(account)(score))
     };
 
     struct AppConfig {
@@ -42,9 +50,7 @@ private:
         EOSLIB_SERIALIZE(AppConfig, (app_owner))
     };
 
+    typedef singleton<code, N(appconfig), code, AppConfig>  AppSettings;
+    typedef multi_index<N(users), User>                     Users;
 
-    typedef singleton<code, N(appconfig),
-                      code, AppConfig   >   AppSettings;
 };
-
-EOSIO_ABI(keepscore, (init)(scored))
