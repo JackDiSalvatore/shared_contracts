@@ -2,7 +2,7 @@
 
 Example Output:
 
-$cleos get table keepscore keepscore users
+`$cleos get table keepscore keepscore users
 {
   "rows": [{
       "keyid": 1704900111,
@@ -27,4 +27,4 @@ $cleos get table keepscore keepscore users
     }
   ],
   "more": false
-}
+}`
