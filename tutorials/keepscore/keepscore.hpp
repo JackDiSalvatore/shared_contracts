@@ -25,7 +25,7 @@ private:
 
     /* Use this to make your app sign transactions */
     account_name appOwner() {
-        return AppSettings().get().app_owner;
+        return AppSettings(code, _self).get().app_owner;
     }
 
     inline static uint64_t hashStr( const string& strkey ){
@@ -50,7 +50,7 @@ private:
         EOSLIB_SERIALIZE(AppConfig, (app_owner))
     };
 
-    typedef singleton<code, N(appconfig), code, AppConfig>  AppSettings;
-    typedef multi_index<N(users), User>                     Users;
+    typedef singleton<N(appconfig), AppConfig>  AppSettings;
+    typedef multi_index<N(users), User>         Users;
 
 };

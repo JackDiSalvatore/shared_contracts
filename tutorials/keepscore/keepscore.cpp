@@ -4,10 +4,11 @@ void keepscore::init(account_name app_owner) {
         require_auth(_self);
         require_auth(app_owner);
 
-        eosio_assert(!AppSettings().exists(), "App already exists");
+        eosio_assert(!AppSettings(code,_self).exists(),
+                     "App already exists");
 
         // construct new singleton data type AppConfig
-        AppSettings().set(AppConfig{app_owner});
+        AppSettings(code,_self).set(AppConfig{app_owner}, _self);
         print("App created with account: ", name{app_owner});
 }
 
@@ -36,9 +37,9 @@ void keepscore::scored(string&             username,
     else if (itr != users.end()) {
         print("Updating ", username.c_str(), "'s score");
 
-/*        users.modify(itr, 0, [&](auto& u) {
+        users.modify(itr, 0, [&](auto& u) {
             u.score = new_score;
-        });*/
+        });
     }
 
 }
