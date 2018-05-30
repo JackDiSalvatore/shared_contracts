@@ -44,4 +44,18 @@ void keepscore::scored(string&             username,
 
 }
 
-EOSIO_ABI(keepscore, (init)(scored))
+void keepscore::remove(string& username, account_name account) {
+    require_auth(appOwner());
+    require_auth(account);
+
+    uuid keyid = hashStr(username);
+
+    Users users(_self, _self);
+
+    auto itr = users.find(keyid);
+
+    eosio_assert(itr != users.end(), "User name does not exist!");
+    users.erase(itr);
+}
+
+EOSIO_ABI(keepscore, (init)(scored)(remove))

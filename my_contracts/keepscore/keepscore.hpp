@@ -16,7 +16,7 @@ public:
                 const account_name  account,
                 uint64_t            new_score);
 
-    void remove();
+    void remove(string& username, account_name account);
 
     static constexpr uint64_t code = N(keepscore);
 
