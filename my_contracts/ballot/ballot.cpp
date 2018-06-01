@@ -42,8 +42,8 @@ void ballot::newmember(account_name account, account_name granter,
     eosio_assert(granter_member->invite_permission,
                  "You do not have permission to add a new member!");
 
-    auto member = Members.find(account);
-    eosio_assert(member == Members.end(), "Memember already exists!");
+    auto member = Members.find(id);
+    eosio_assert(member == Members.end(), "Member already exists!");
 
     /* Create New Member */
     Members.emplace(_self, [&](auto& m) {
@@ -58,6 +58,7 @@ void ballot::newmember(account_name account, account_name granter,
 }
 
 void ballot::rmmember(account_name member) {
+    require_auth(appKey());
     require_auth(member);
 
     uint64_t id = accountHash(member);
@@ -100,7 +101,17 @@ void ballot::propose(account_name proposer, string title, string description) {
 }
 
 void ballot::addvote(account_name voter, uint64_t proposal_id) {
+    require_auth(appKey());
     require_auth(voter);
+
+    // Find the member 'voter'
+    uint64_t id = accountHash(voter);
+
+    auto member = Members.find(id);
+    eosio_assert(member != Members.end(), "Member doesn't exists!");
+    // Find the proposal by 'proposal_id'
+
+    // push a vote to the vote vector in the proposal
 
     print("TODO ");
 }
