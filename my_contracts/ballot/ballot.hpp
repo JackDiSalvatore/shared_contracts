@@ -51,7 +51,7 @@ private:
 
     struct Vote {
         account_name voter;
-        bool         vote;
+        uint64_t     vote;
     };
 
     // @abi table proposals i64
