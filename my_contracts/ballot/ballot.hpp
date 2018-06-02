@@ -28,13 +28,16 @@ public:
     void rmmember(account_name member);
 
     // @abi action
-    void propose(account_name proposer, string title, string description);
+    void propose(account_name proposer, const string& title, const string& description);
 
     // @abi action
-    void addvote(account_name voter, uint64_t proposal_id);
+    void rmproposal(account_name proposal_owner, const string& title);
 
     // @abi action
-    void rmvote(account_name voter, uint64_t proposal_id);
+    void addvote(account_name voter, const string& proposal_title);
+
+    // @abi action
+    void rmvote(account_name voter, const string& proposal_title);
 
 private:
     // @abi table members i64
@@ -50,8 +53,8 @@ private:
     };
 
     struct Vote {
-        account_name voter;
         uint64_t     vote;
+        account_name voter_name;
     };
 
     // @abi table proposals i64

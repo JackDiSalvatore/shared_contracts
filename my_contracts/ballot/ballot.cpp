@@ -68,7 +68,7 @@ void ballot::rmmember(account_name member) {
     Members.erase(itr);
 }
 
-void ballot::propose(account_name proposer, string title, string description) {
+void ballot::propose(account_name proposer, const string& title, const string& description) {
     require_auth(appKey());
     require_auth(proposer);
 
@@ -100,23 +100,58 @@ void ballot::propose(account_name proposer, string title, string description) {
 
 }
 
-void ballot::addvote(account_name voter, uint64_t proposal_id) {
+void ballot::rmproposal(account_name proposal_owner, const string& title) {
+    require_auth(appKey());
+    require_auth(proposal_owner);
+
+    uint64_t proposer_id = accountHash(proposal_owner);
+    uint64_t proposal_id = murmur(title);
+
+    auto proposer_member = Members.find(proposer_id);
+    eosio_assert(proposer_member != Members.end(), "Member does not exist");
+
+    auto proposal = Proposals.find(proposal_id);
+    eosio_assert(proposal != Proposals.end(), "Proposal does not exist");
+
+    Proposals.erase(proposal);
+
+    print("Proposal: ", proposal->title.c_str(), " removed from the database\n");
+
+}
+
+void ballot::addvote(account_name voter, const string& proposal_title) {
     require_auth(appKey());
     require_auth(voter);
 
     // Find the member 'voter'
     uint64_t id = accountHash(voter);
+    uint64_t proposal_id = murmur(proposal_title);
 
     auto member = Members.find(id);
-    eosio_assert(member != Members.end(), "Member doesn't exists!");
+    eosio_assert(member != Members.end(), "Member does not exists!");
+
+    // Create the new vote
+
     // Find the proposal by 'proposal_id'
+    auto proposal = Proposals.find(proposal_id);
+    eosio_assert(proposal != Proposals.end(), "Proposal does not exist");
+
+    // Check to make sure user hasn't already voted for this proposal
 
     // push a vote to the vote vector in the proposal
+    Proposals.modify(proposal, 0, [&](auto& p) {
+        Vote new_vote = { 
+            .vote = member->weight,
+            .voter_name = member->account
+        };
+        p.votes.push_back(new_vote);
+        //p.votes.pop_back();
+    });
 
-    print("TODO ");
+    print("'", name{voter}, "' voted for '", proposal->title.c_str(), "'\n");
 }
 
-void ballot::rmvote(account_name voter, uint64_t proposal_id) {
+void ballot::rmvote(account_name voter, const string& proposal_title) {
     require_auth(voter);
 
     print("TODO");
@@ -155,4 +190,4 @@ void ballot::rmvote(account_name voter, uint64_t proposal_id) {
     return *new_member;
 }*/
 
-EOSIO_ABI( ballot, (init)(propose)(newmember)(rmmember)(addvote)(rmvote) )
+EOSIO_ABI( ballot, (init)(newmember)(rmmember)(propose)(rmproposal)(addvote)(rmvote) )

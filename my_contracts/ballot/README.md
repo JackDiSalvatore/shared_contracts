@@ -4,15 +4,46 @@ This contract can be used by any application that wishes to create proposals tha
 # About
 Users can create proposals that consist of a description.  In order for other users to vote on the proposal, they must become a member of the contract.
 
-## Tables
-members: A user of the contract.  A member has the ability to;
-* vote on proposals
-* allow other members to join the contract
 
-proposals: Any member can create a proposal.  A proposal can be a new law or rule for the game.  Proposals must be approved by % of the active members within the contract.
+## Tables
+members
+--------
+* member_id ( key )
++ account
++ weight
++ granter
++ invite_permission
+--------
+
+proposals
+---------
+* id  ( key )
++ account
++ title
++ description
++ votes[]
++ approved
+---------
+
+proposals: Any member can create a proposal.  A proposal can be anything, i.e. new law or rule.  Proposals must be approved by x% of the active members within the contract.
+
+approval mechanism:
+x% of active members must vote for proposal
+Need to know
+* p = percentage of votes need for approval (as decimal)
+* m = members: get the amount of elements in the container
+* v = votes needed: proposal.votes.size()
+v = p * m
+
+Ex:
+m = 100
+p = 60% (0.6)
+
+v = 100 * 0.6
+v = 60 votes
 
 ## Actions
-init: Concieve this contract
+init: Conceive this contract
 * creates the settings for the contract
   * creates the 'creator' of the contract.  The creator is the first member of the
     contract.  Since the creator is also the owner, they cannot vote (weight=0), 
@@ -28,7 +59,9 @@ propose: Creates a new proposal
 
 rmproposal: Free up storage for a proposal that wants to be deleted
 
-vote: Allows members to vote on a proposals
+addvote: Allows members to vote on a proposals
+
+rmvote: Removes vote to free up storage
 
 ### Example Commands
 ```
@@ -49,7 +82,7 @@ $cleos get table ballot ballot members
     },{
       "member_id": 3877138775,
       "account": "userc",
-      "weight": 1,
+      "weight": 3,
       "granter": "userb",
       "invite_permission": 1
     }
@@ -74,7 +107,17 @@ $cleos get table ballot ballot proposals
       "account": "usera",
       "title": "My Proposal",
       "description": "My rule goes here.",
-      "votes": [],
+      "votes": [{
+          "vote": 1,
+          "voter_name": "usera"
+        },{
+          "vote": 3,
+          "voter_name": "userc"
+        },{
+          "vote": 1,
+          "voter_name": "userb"
+        }
+      ],
       "approved": 0
     }
   ],
