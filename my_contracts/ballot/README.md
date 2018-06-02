@@ -63,6 +63,7 @@ addvote: Allows members to vote on a proposals
 
 rmvote: Removes vote to free up storage
 
+
 ### Example Commands
 ```
 $cleos get table ballot ballot members
