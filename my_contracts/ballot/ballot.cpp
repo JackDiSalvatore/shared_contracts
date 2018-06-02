@@ -145,7 +145,6 @@ void ballot::addvote(account_name voter, const string& proposal_title) {
             .voter_name = member->account
         };
         p.votes.push_back(new_vote);
-        //p.votes.pop_back();
     });
 
     print("'", name{voter}, "' voted for '", proposal->title.c_str(), "'\n");
