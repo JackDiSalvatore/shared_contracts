@@ -21,7 +21,7 @@ public:
     void init(account_name appKey);
 
     // @abi action
-    void newmember(account_name  account, account_name granter,
+    void addmember(account_name  account, account_name granter,
                    uint32_t     weight, bool invite_permission);
 
     // @abi action

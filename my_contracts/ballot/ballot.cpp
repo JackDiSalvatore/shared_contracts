@@ -16,6 +16,8 @@ void ballot::init(account_name appKey) {
     BallotSettings(code, _self).set(Settings{appKey}, _self);
 
     /* Emplce the first member; the creator */
+    /* TODO: consider refactoring this to send and INLINE_ACTION to 
+    *  'addmember'  */
     auto creator = Members.emplace(_self, [&](auto& m) {
         m.member_id = id;
         m.account = appKey;
@@ -27,7 +29,7 @@ void ballot::init(account_name appKey) {
     print("Contract Initialized by ", name{appKey});
 }
 
-void ballot::newmember(account_name account, account_name granter,
+void ballot::addmember(account_name account, account_name granter,
                        uint32_t     weight, bool invite_permission) {
     require_auth(appKey());
     require_auth(account);
@@ -134,7 +136,7 @@ void ballot::addvote(account_name voter, const string& proposal_title) {
     auto proposal = Proposals.find(proposal_id);
     eosio_assert(proposal != Proposals.end(), "Proposal does not exist");
 
-    // Check to make sure user hasn't already voted for this proposal
+    // Check to make sure member hasn't already voted for this proposal
     auto vote_itr = proposal->votes.begin();
 
     for(; vote_itr != proposal->votes.end(); ++vote_itr) {
@@ -195,4 +197,4 @@ void ballot::rmvote(account_name voter, const string& proposal_title) {
     return *new_member;
 }*/
 
-EOSIO_ABI( ballot, (init)(newmember)(rmmember)(propose)(rmproposal)(addvote)(rmvote) )
+EOSIO_ABI( ballot, (init)(addmember)(rmmember)(propose)(rmproposal)(addvote)(rmvote) )

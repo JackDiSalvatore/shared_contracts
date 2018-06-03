@@ -33,7 +33,7 @@
  (import "env" "require_auth" (func $require_auth (param i64)))
  (import "env" "require_auth2" (func $require_auth2 (param i64 i64)))
  (table 8 8 anyfunc)
- (elem (i32.const 0) $__wasm_nullptr $_ZN6ballot6rmvoteEyRKNSt3__112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE $_ZN6ballot8rmmemberEy $_ZN6ballot4initEy $_ZN6ballot10rmproposalEyRKNSt3__112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE $_ZN6ballot9newmemberEyymb $_ZN6ballot7proposeEyRKNSt3__112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEES8_ $_ZN6ballot7addvoteEyRKNSt3__112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE)
+ (elem (i32.const 0) $__wasm_nullptr $_ZN6ballot9addmemberEyymb $_ZN6ballot10rmproposalEyRKNSt3__112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE $_ZN6ballot4initEy $_ZN6ballot6rmvoteEyRKNSt3__112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE $_ZN6ballot7proposeEyRKNSt3__112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEES8_ $_ZN6ballot8rmmemberEy $_ZN6ballot7addvoteEyRKNSt3__112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE)
  (memory $0 1)
  (data (i32.const 4) "\a0f\00\00")
  (data (i32.const 16) "cannot create objects in table of another contract\00")
@@ -82,7 +82,7 @@
  (export "now" (func $now))
  (export "_ZN5eosio12require_authERKNS_16permission_levelE" (func $_ZN5eosio12require_authERKNS_16permission_levelE))
  (export "_ZN6ballot4initEy" (func $_ZN6ballot4initEy))
- (export "_ZN6ballot9newmemberEyymb" (func $_ZN6ballot9newmemberEyymb))
+ (export "_ZN6ballot9addmemberEyymb" (func $_ZN6ballot9addmemberEyymb))
  (export "_ZN6ballot8rmmemberEy" (func $_ZN6ballot8rmmemberEy))
  (export "_ZN6ballot7proposeEyRKNSt3__112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEES8_" (func $_ZN6ballot7proposeEyRKNSt3__112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEES8_))
  (export "_ZN6ballot10rmproposalEyRKNSt3__112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE" (func $_ZN6ballot10rmproposalEyRKNSt3__112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE))
@@ -2185,7 +2185,7 @@
    )
   )
  )
- (func $_ZN6ballot9newmemberEyymb (type $FUNCSIG$vijjii) (param $0 i32) (param $1 i64) (param $2 i64) (param $3 i32) (param $4 i32)
+ (func $_ZN6ballot9addmemberEyymb (type $FUNCSIG$vijjii) (param $0 i32) (param $1 i64) (param $2 i64) (param $3 i32) (param $4 i32)
   (local $5 i32)
   (local $6 i32)
   (local $7 i64)
@@ -12215,7 +12215,7 @@
           (br_if $label$27
            (i64.le_s
             (get_local $2)
-            (i64.const -4851649661222240257)
+            (i64.const -4848322189402832897)
            )
           )
           (br_if $label$26
@@ -12227,38 +12227,38 @@
           (br_if $label$25
            (i64.eq
             (get_local $2)
-            (i64.const -4851649661222240256)
+            (i64.const -4848322189402832896)
            )
           )
           (br_if $label$21
            (i64.ne
             (get_local $2)
-            (i64.const -4848322189402832896)
+            (i64.const 3626283120069181440)
            )
           )
-          (i32.store offset=68
+          (i32.store offset=108
            (get_local $11)
            (i32.const 0)
           )
-          (i32.store offset=64
+          (i32.store offset=104
            (get_local $11)
            (i32.const 1)
           )
-          (i64.store offset=56 align=4
+          (i64.store offset=16 align=4
            (get_local $11)
-           (i64.load offset=64
+           (i64.load offset=104
             (get_local $11)
            )
           )
           (drop
-           (call $_ZN5eosio14execute_actionI6ballotS1_JyRKNSt3__112basic_stringIcNS2_11char_traitsIcEENS2_9allocatorIcEEEEEEEbPT_MT0_FvDpT1_E
+           (call $_ZN5eosio14execute_actionI6ballotS1_JyymbEEEbPT_MT0_FvDpT1_E
             (i32.add
              (get_local $11)
              (i32.const 120)
             )
             (i32.add
              (get_local $11)
-             (i32.const 56)
+             (i32.const 16)
             )
            )
           )
@@ -12267,44 +12267,44 @@
          (br_if $label$24
           (i64.eq
            (get_local $2)
-           (i64.const -7297760726071377920)
+           (i64.const -5915097261842366464)
           )
          )
          (br_if $label$23
           (i64.eq
            (get_local $2)
-           (i64.const -5915097261842366464)
+           (i64.const -4853568554919788544)
           )
          )
          (br_if $label$21
           (i64.ne
            (get_local $2)
-           (i64.const -4853568554919788544)
+           (i64.const -4851649661222240256)
           )
          )
-         (i32.store offset=100
+         (i32.store offset=84
           (get_local $11)
           (i32.const 0)
          )
-         (i32.store offset=96
+         (i32.store offset=80
           (get_local $11)
           (i32.const 2)
          )
-         (i64.store offset=24 align=4
+         (i64.store offset=40 align=4
           (get_local $11)
-          (i64.load offset=96
+          (i64.load offset=80
            (get_local $11)
           )
          )
          (drop
-          (call $_ZN5eosio14execute_actionI6ballotS1_JyEEEbPT_MT0_FvDpT1_E
+          (call $_ZN5eosio14execute_actionI6ballotS1_JyRKNSt3__112basic_stringIcNS2_11char_traitsIcEENS2_9allocatorIcEEEEEEEbPT_MT0_FvDpT1_E
            (i32.add
             (get_local $11)
             (i32.const 120)
            )
            (i32.add
             (get_local $11)
-            (i32.const 24)
+            (i32.const 40)
            )
           )
          )
@@ -12350,17 +12350,17 @@
         )
         (br $label$21)
        )
-       (i32.store offset=84
+       (i32.store offset=68
         (get_local $11)
         (i32.const 0)
        )
-       (i32.store offset=80
+       (i32.store offset=64
         (get_local $11)
         (i32.const 4)
        )
-       (i64.store offset=40 align=4
+       (i64.store offset=56 align=4
         (get_local $11)
-        (i64.load offset=80
+        (i64.load offset=64
          (get_local $11)
         )
        )
@@ -12372,63 +12372,63 @@
          )
          (i32.add
           (get_local $11)
-          (i32.const 40)
+          (i32.const 56)
          )
         )
        )
        (br $label$21)
       )
-      (i32.store offset=108
+      (i32.store offset=92
        (get_local $11)
        (i32.const 0)
       )
-      (i32.store offset=104
+      (i32.store offset=88
        (get_local $11)
        (i32.const 5)
       )
-      (i64.store offset=16 align=4
+      (i64.store offset=32 align=4
        (get_local $11)
-       (i64.load offset=104
+       (i64.load offset=88
         (get_local $11)
        )
       )
       (drop
-       (call $_ZN5eosio14execute_actionI6ballotS1_JyymbEEEbPT_MT0_FvDpT1_E
+       (call $_ZN5eosio14execute_actionI6ballotS1_JyRKNSt3__112basic_stringIcNS2_11char_traitsIcEENS2_9allocatorIcEEEESA_EEEbPT_MT0_FvDpT1_E
         (i32.add
          (get_local $11)
          (i32.const 120)
         )
         (i32.add
          (get_local $11)
-         (i32.const 16)
+         (i32.const 32)
         )
        )
       )
       (br $label$21)
      )
-     (i32.store offset=92
+     (i32.store offset=100
       (get_local $11)
       (i32.const 0)
      )
-     (i32.store offset=88
+     (i32.store offset=96
       (get_local $11)
       (i32.const 6)
      )
-     (i64.store offset=32 align=4
+     (i64.store offset=24 align=4
       (get_local $11)
-      (i64.load offset=88
+      (i64.load offset=96
        (get_local $11)
       )
      )
      (drop
-      (call $_ZN5eosio14execute_actionI6ballotS1_JyRKNSt3__112basic_stringIcNS2_11char_traitsIcEENS2_9allocatorIcEEEESA_EEEbPT_MT0_FvDpT1_E
+      (call $_ZN5eosio14execute_actionI6ballotS1_JyEEEbPT_MT0_FvDpT1_E
        (i32.add
         (get_local $11)
         (i32.const 120)
        )
        (i32.add
         (get_local $11)
-        (i32.const 32)
+        (i32.const 24)
        )
       )
      )
