@@ -130,21 +130,27 @@ void ballot::addvote(account_name voter, const string& proposal_title) {
     auto member = Members.find(id);
     eosio_assert(member != Members.end(), "Member does not exists!");
 
-    // Create the new vote
-
     // Find the proposal by 'proposal_id'
     auto proposal = Proposals.find(proposal_id);
     eosio_assert(proposal != Proposals.end(), "Proposal does not exist");
 
     // Check to make sure user hasn't already voted for this proposal
+    auto vote_itr = proposal->votes.begin();
+
+    for(; vote_itr != proposal->votes.end(); ++vote_itr) {
+        //print("itr  : ", name{vote_itr->voter_name}, "\n");
+        //print("Input: ", name{voter}, "\n");
+        eosio_assert(vote_itr->voter_name != voter, "Member already voted for this proposal");
+    }
 
     // push a vote to the vote vector in the proposal
     Proposals.modify(proposal, 0, [&](auto& p) {
+        // Create the new vote
         Vote new_vote = { 
             .vote = member->weight,
             .voter_name = member->account
         };
-        p.votes.push_back(new_vote);
+       p.votes.push_back(new_vote);
     });
 
     print("'", name{voter}, "' voted for '", proposal->title.c_str(), "'\n");
