@@ -126,10 +126,10 @@ void ballot::addvote(account_name voter, const string& proposal_title) {
     require_auth(voter);
 
     // Find the member 'voter'
-    uint64_t id = accountHash(voter);
+    uint64_t voter_id = accountHash(voter);
     uint64_t proposal_id = murmur(proposal_title);
 
-    auto member = Members.find(id);
+    auto member = Members.find(voter_id);
     eosio_assert(member != Members.end(), "Member does not exists!");
 
     // Find the proposal by 'proposal_id'
@@ -159,9 +159,51 @@ void ballot::addvote(account_name voter, const string& proposal_title) {
 }
 
 void ballot::rmvote(account_name voter, const string& proposal_title) {
+    require_auth(appKey());
     require_auth(voter);
 
-    print("TODO");
+    bool is_vote_found = false;
+
+    uint64_t voter_id = accountHash(voter);
+    uint64_t proposal_id = murmur(proposal_title);
+
+    // find voter
+    auto member = Members.find(voter_id);
+    eosio_assert(member != Members.end(), "Member does not exists!");
+
+    // Find the proposal
+    auto proposal = Proposals.find(proposal_id);
+    eosio_assert(proposal != Proposals.end(), "Proposal does not exist");
+
+    // find vote inside proposal
+    Vote vote_to_find = {
+        .vote = member->weight,
+        .voter_name = member->account
+    };
+
+    /* The 'find' algorith was not compiling so I did it manualy.  However this is not very
+    *  efficent.  Should be refactored in the future */
+    //auto found_vote = find(proposal->votes.begin(), proposal->votes.end(), vote_to_find);
+    //eosio_assert(found_vote != proposal->votes.end(), "Member has not voted for this proposal");
+
+    auto vote_itr = proposal->votes.begin();
+    while( (vote_itr != proposal->votes.end()) && !is_vote_found) {
+        //print("vote_itr: ", name{vote_itr->voter_name}, "\n");
+        if (vote_itr->voter_name == voter) {
+            is_vote_found = true;
+ 
+            print("Removing vote for '", name{vote_itr->voter_name}, "'\n");
+ 
+            Proposals.modify(proposal, 0, [&](auto& p) {
+                p.votes.erase(vote_itr);
+            });
+            return;
+        }
+        ++vote_itr;
+    }
+
+    eosio_assert(0, "Member has not voted for this proposals!");
+
 }
 
 /*****************************************************************************

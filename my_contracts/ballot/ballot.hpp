@@ -52,6 +52,8 @@ private:
         EOSLIB_SERIALIZE(Member, (member_id)(account)(weight)(granter)(invite_permission))
     };
 
+    /* TODO: Since a vote is basically a key value pair (name, vote)
+    *        consider changing the vector to a 'map' */
     struct Vote {
         uint64_t     vote;
         account_name voter_name;
