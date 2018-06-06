@@ -25,7 +25,7 @@ public:
                    uint32_t     weight, bool invite_permission);
 
     // @abi action
-    void rmmember(account_name member);
+    void rmmember(account_name account);
 
     // @abi action
     void propose(account_name proposer, const string& title, const string& description);
@@ -39,7 +39,17 @@ public:
     // @abi action
     void rmvote(account_name voter, const string& proposal_title);
 
+    // @abi action
+    void countvotes(const string& proposal_title);
+
 private:
+    /* TODO: Since a vote is basically a key value pair (name, vote)
+    *        consider changing the vector to a 'map' */
+    struct Vote {
+        uint64_t     vote;
+        account_name voter_name;
+    };
+
     // @abi table members i64
     struct Member {
         uint64_t     member_id;
@@ -50,13 +60,6 @@ private:
 
         uint64_t primary_key() const { return member_id; }
         EOSLIB_SERIALIZE(Member, (member_id)(account)(weight)(granter)(invite_permission))
-    };
-
-    /* TODO: Since a vote is basically a key value pair (name, vote)
-    *        consider changing the vector to a 'map' */
-    struct Vote {
-        uint64_t     vote;
-        account_name voter_name;
     };
 
     // @abi table proposals i64
@@ -85,12 +88,16 @@ private:
 
     typedef singleton<N(settings), Settings>  BallotSettings;
 
-    inline Member get_member(account_name voter);
+/*    inline Member get_member(account_name voter);*/
 
 /*    inline Member create_member(account_name account,
                                 account_name granter,
                                 uint32_t     weight,
                                 bool         invite_permission);*/
+
+    inline bool check_for_approval(const uint64_t& votes_cast,
+                                   const uint64_t& votes_total,
+                                   const double&   percentage_needed);
 
     /* HELPER FUNCTIONS */
     account_name appKey() {

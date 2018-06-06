@@ -59,11 +59,11 @@ void ballot::addmember(account_name account, account_name granter,
     print("New Member Added: ", name{account});
 }
 
-void ballot::rmmember(account_name member) {
+void ballot::rmmember(account_name account) {
     require_auth(appKey());
-    require_auth(member);
+    require_auth(account);
 
-    uint64_t id = accountHash(member);
+    uint64_t id = accountHash(account);
 
     auto itr = Members.find(id);
 
@@ -139,7 +139,7 @@ void ballot::addvote(account_name voter, const string& proposal_title) {
     // Check to make sure member hasn't already voted for this proposal
     auto vote_itr = proposal->votes.begin();
 
-    for(; vote_itr != proposal->votes.end(); ++vote_itr) {
+    for (; vote_itr != proposal->votes.end(); ++vote_itr) {
         //print("itr  : ", name{vote_itr->voter_name}, "\n");
         //print("Input: ", name{voter}, "\n");
         eosio_assert(vote_itr->voter_name != voter, "Member already voted for this proposal");
@@ -191,9 +191,9 @@ void ballot::rmvote(account_name voter, const string& proposal_title) {
         //print("vote_itr: ", name{vote_itr->voter_name}, "\n");
         if (vote_itr->voter_name == voter) {
             is_vote_found = true;
- 
+
             print("Removing vote for '", name{vote_itr->voter_name}, "'\n");
- 
+
             Proposals.modify(proposal, 0, [&](auto& p) {
                 p.votes.erase(vote_itr);
             });
@@ -206,9 +206,56 @@ void ballot::rmvote(account_name voter, const string& proposal_title) {
 
 }
 
+void ballot::countvotes(const string& title) {
+    require_auth(appKey());
+
+    uint64_t proposal_id = murmur(title);
+
+    // find proposal
+    auto proposal = Proposals.find(proposal_id);
+    eosio_assert(proposal != Proposals.end(), "Proposal does not exist");
+
+    // count all votes cast
+    uint64_t total_votes_cast = 0;
+    for (auto vote_itr = proposal->votes.begin(); vote_itr != proposal->votes.end(); ++vote_itr) {
+        total_votes_cast += vote_itr->vote;
+    }
+    print("Total votes cast for this proposal: ", total_votes_cast, "\n");
+
+    // count the total voting power in existance
+    uint64_t total_voting_weight = 0;
+    for (auto member = Members.begin(); member != Members.end(); ++member) {
+        total_voting_weight += member->weight;
+    }
+    print("Total voting weight in existance: ", total_voting_weight, "\n");
+
+    // check to approve
+    if (check_for_approval(total_votes_cast, total_voting_weight, 0.75 /* Test */)) {
+        Proposals.modify(proposal, 0, [&](auto& p) {
+            p.approved = true;
+        });
+        print("APPROVED!\n");
+    }
+    else {
+        Proposals.modify(proposal, 0, [&](auto& p) {
+            p.approved = false;
+        });
+        print("NOT APPROVED!\n");
+    }
+}
+
 /*****************************************************************************
  *                      PRIVATE MEMBER FUNCTIONS
  ****************************************************************************/
+
+bool ballot::check_for_approval(const uint64_t& votes_cast,
+                                const uint64_t& votes_total,
+                                const double&   percentage_needed) {
+    print("Percentage needed: ", percentage_needed, "\n");
+    print("Votes needed: ", votes_total * percentage_needed, "\n");
+
+    return (votes_cast > (votes_total * percentage_needed)) ? true : false;
+}
 
 /*ballot::Member ballot::get_member(account_name voter) {
     auto member = ballot::Members.find(voter);
@@ -239,4 +286,4 @@ void ballot::rmvote(account_name voter, const string& proposal_title) {
     return *new_member;
 }*/
 
-EOSIO_ABI( ballot, (init)(addmember)(rmmember)(propose)(rmproposal)(addvote)(rmvote) )
+EOSIO_ABI( ballot, (init)(addmember)(rmmember)(propose)(rmproposal)(addvote)(rmvote)(countvotes) )

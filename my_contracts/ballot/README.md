@@ -4,6 +4,13 @@ This contract can be used by any application that wishes to create proposals tha
 # About
 Users can create proposals that consist of a description.  In order for other users to vote on the proposal, they must become a member of the contract.
 
+## Singletons
+settings
+--------
+* appKey (key)
++ voting_enabled
++ approval_percentage (NOT IMPLEMENTED YET)
+--------
 
 ## Tables
 members
@@ -25,22 +32,25 @@ proposals
 + approved
 ---------
 
-proposals: Any member can create a proposal.  A proposal can be anything, i.e. new law or rule.  Proposals must be approved by x% of the active members within the contract.
+proposals: Any member can create a proposal.  A proposal can be anything, i.e. new law or rule.  Proposals get approved once they reach x% of the combined voting weight from all the members.
 
-approval mechanism:
-x% of active members must vote for proposal
-Need to know
-* p = percentage of votes need for approval (as decimal)
-* m = members: get the amount of elements in the container
-* v = votes needed: proposal.votes.size()
-v = p * m
+Approval Mechanism:
+x% of the active member weight must vote for the proposal inorder for it to be approved
 
 Ex:
-m = 100
-p = 60% (0.6)
+* p = percentage of total vote weight needed for approval (as decimal, for now)
+* m = total votes cast
+* a = total votes needed (summation of all members weights)
+approval = m > (p * a)
 
-v = 100 * 0.6
-v = 60 votes
+p = 75% (0.75)
+m = 250
+a = 500
+
+approval = 250 > (0.75 * 500)
+approval = 250 > 375
+approval failed
+
 
 ## Actions
 init: Conceive this contract
@@ -52,19 +62,57 @@ init: Conceive this contract
 * creates the first member of the contract
 
 addmember: Adds a new member to the contract
+  account
+  granter
+  weight
+  invite_permission
 
 rmmember: Free up the storage for the member that wants to leave
+  account
 
 propose: Creates a new proposal
+  proposer account
+  title
+  description
 
 rmproposal: Free up storage for a proposal that wants to be deleted
+  proposer account
+  title
 
 addvote: Allows members to vote on a proposals
+  voter account
+  proposal title
 
 rmvote: Removes vote to free up storage
+  voter account
+  proposal title
 
+countvotes: Tallys up the votes for a proposal.  If the amount surpasses the threshold, then the proposal will be approved.
+  proposal title
 
 ### Example Commands
+1) Create contract and set contract owner
+
+`$cleos push action ballot init '["ballot"]' -p ballot`
+
+2) Add new members
+
+`$cleos push action ballot addmember '["usera","ballot","1","1"]' -p usera ballot`
+
+3) Create a new proposal
+
+`$cleos push action ballot propose '["usera","Proposal Title","Description of proposal"]' -p usera ballot`
+
+
+4) Vote on proposal
+
+`$cleos push action ballot addvote '["usera","Proposal Title"]' -p usera ballot`
+
+5) Approve proposal
+
+`$cleos push action ballot countvotes '["Proposal Title"]' -p ballot`
+
+
 ```
 $cleos get table ballot ballot members
 {
