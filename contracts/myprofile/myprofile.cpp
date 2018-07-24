@@ -39,8 +39,8 @@ class myprofile : public eosio::contract {
       }
 
       // Notifications
-      void transfer(const asset& pot) {
-
+      void mytransfer(const asset& pot) {
+        print("myprofile::mytransfer");
       }
 
 private:
@@ -70,10 +70,9 @@ void apply(uint64_t receiver, uint64_t code, uint64_t action) {
   if (myprofile::is_token_transfer(code, action)) {
     eosio::token_transfer action = unpack_action_data<eosio::token_transfer>();
 
-    print("CAUGHT TRANSACTION");
     // Only pass notification to myprofile if transfer `to` is myprofile contract account and `quantity` are EOS tokens
     if (action.to == self && action.quantity.symbol == CORE_SYMBOL) {
-      myprofile(self).transfer(action.quantity);
+      myprofile(self).mytransfer(action.quantity);
     }
 
     eosio_exit(0);
