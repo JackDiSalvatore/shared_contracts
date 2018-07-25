@@ -3,12 +3,15 @@
 #include <eosiolib/asset.hpp>
 
 
-using namespace eosio;
+#define GYTZ_SYMBOL S(4,GYTZ)
 
-// static const uint64_t EOS_PRECISION = 4;
-// static const asset_symbol EOS_SYMBOL = S(EOS_PRECISION, EOS);
 
 namespace eosio {
+
+const account_name TOKEN_ACCOUNT = N(mytokenaccnt);
+const account_name TOKEN_ACTION_TRANSFER = N(transfer);
+
+
 /**
  * FIXME:
  * The actual `eosio.token` transfer struct definition until its definition is accesible
@@ -22,30 +25,85 @@ struct token_transfer {
   asset quantity;
   std::string memo;
 };
-}  // namespace eosio
 
 
-class myprofile : public eosio::contract {
-  public:
-      using contract::contract;
+class myprofile : public contract {
+public:
 
-      static bool is_token_transfer(uint64_t code, uint64_t action) {
-         return code == N(eosio.token) && action == N(transfer);
+   explicit myprofile( account_name self )
+            : contract( self ),
+              blacklist( _self, _self ) {}
+
+   /** ACTIONS **/
+
+   /// @abi action
+   void hi( account_name user ) {
+      print( "Hello, ", name{user} );
+   }
+
+   // @abi action
+   void blacklistadd( account_name account ) {
+      require_auth( _self );
+
+      auto blacklist_itr = blacklist.find( account );
+
+      eosio_assert( blacklist_itr == blacklist.end(),
+                   " account alreaded blacklisted");
+
+      blacklist.emplace( _self, [&](auto& bl) {
+         bl.account = account;
+      });
+   }
+
+   // @abi action
+   void blacklistrm( account_name account ) {
+      require_auth( _self );
+
+      auto blacklist_itr = blacklist.find( account );
+
+      eosio_assert( blacklist_itr != blacklist.end(),
+                    " account not on blacklist");
+
+      const auto& blacklisted_account = *blacklist_itr;
+
+      blacklist.erase( blacklisted_account );
+   }
+
+   /** CALLBACKS **/
+
+   void cb_transfer() {
+      token_transfer action = unpack_action_data<eosio::token_transfer>();
+
+      auto blacklist_itr = blacklist.find( action.from );
+
+      eosio_assert( blacklist_itr == blacklist.end(), " sender blacklisted");
+
+      if (action.to == _self && action.quantity.symbol == GYTZ_SYMBOL) {
+         print("You got ", action.quantity, " tokens!");
       }
+   }
 
-      /// @abi action
-      void hi( account_name user ) {
-         print( "Hello, ", name{user} );
-      }
+   /** NOTIFCATION **/
 
-      // Notifications
-      void mytransfer(const asset& pot) {
-        print("myprofile::mytransfer");
-      }
+   static bool is_token_transfer(uint64_t code, uint64_t action) {
+      return code == TOKEN_ACCOUNT && action == TOKEN_ACTION_TRANSFER;
+   }
 
 private:
 
+   /// @abi table blacklist i64
+   struct blacklist_row {
+      account_name account;
+
+      uint64_t primary_key() const { return account; }
+   };
+
+   typedef multi_index<N(blacklist), blacklist_row> blacklist_index;
+
+   blacklist_index blacklist;
+
 };
+
 
 /**
  * SmartContract C entrypoint using a macro based on the list of action in the.
@@ -58,24 +116,21 @@ private:
  */
 extern "C" {
 void apply(uint64_t receiver, uint64_t code, uint64_t action) {
-  auto self = receiver;
-  if (code == self) {
-    // Don't rename `thiscontract`, it's being use verbatim in `EOSIO_API` macro
-    myprofile thiscontract(self);
-    switch (action) { EOSIO_API(myprofile, (hi)) }
+   auto self = receiver;
+   if (code == self) {
+      // Don't rename `thiscontract`, it's being use verbatim in `EOSIO_API` macro
+      myprofile thiscontract(self);
+      switch (action) { EOSIO_API(myprofile, (hi)(blacklistadd)(blacklistrm)) }
 
-    eosio_exit(0);
-  }
+      eosio_exit(0);
+   }
 
-  if (myprofile::is_token_transfer(code, action)) {
-    eosio::token_transfer action = unpack_action_data<eosio::token_transfer>();
-
-    // Only pass notification to myprofile if transfer `to` is myprofile contract account and `quantity` are EOS tokens
-    if (action.to == self && action.quantity.symbol == CORE_SYMBOL) {
-      myprofile(self).mytransfer(action.quantity);
-    }
-
-    eosio_exit(0);
-  }
+   if ( myprofile::is_token_transfer(code, action) ) {
+      myprofile(self).cb_transfer();
+      eosio_exit(0);
+   }
 }
 }
+
+
+}  /// namespace eosio
